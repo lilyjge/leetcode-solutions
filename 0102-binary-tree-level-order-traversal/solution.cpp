@@ -1,3 +1,5 @@
+typedef pair<TreeNode*, int> pi;
+
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
@@ -12,18 +14,19 @@
 class Solution {
 public:
     vector<vector<int>> levelOrder(TreeNode* root) {
-        vector<vector<int>> order;
-        queue<pair<int, TreeNode*>> q;
-        q.push({0, root});
+        vector<vector<int>> ans;
+        queue<pi> q;
+        q.push({root, 0});
         while(!q.empty()) {
-            auto e = q.front(); q.pop();
-            if (e.second == nullptr) continue;
-            if (order.size() <= e.first) 
-                order.push_back({});
-            order[e.first].push_back(e.second->val);
-            q.push({e.first + 1, e.second->left});
-            q.push({e.first + 1, e.second->right});
-        }     
-        return order;
+            auto cur = q.front(); q.pop();
+            if (cur.first == nullptr) continue;
+            TreeNode* r = cur.first;
+            int i = cur.second;
+            if (i >= ans.size()) ans.push_back({});
+            ans[i].push_back(r->val);
+            q.push({r->left, i + 1});
+            q.push({r->right, i + 1});
+        }
+        return ans;
     }
 };
