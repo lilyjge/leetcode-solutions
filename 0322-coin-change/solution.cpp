@@ -1,19 +1,18 @@
 class Solution {
 public:
     int coinChange(vector<int>& coins, int amount) {
-        int INTMAX = 1e4 + 2;
-        vector<int> nums(amount + 1, INTMAX);
-        nums[0] = 0;
-        for(int i = 1; i <= amount; i++) {
-            // cout << "amount " << i << endl;
-            for (int c : coins) {
-                if (c > i || nums[i - c] == INTMAX) continue;
-                // cout << "coin " << c << endl;
-                nums[i] = min(nums[i - c] + 1, nums[i]);
-                // cout << "res " << nums[i] << endl;
+        vector<int> dp(amount + 1, -1);
+        dp[0] = 0;
+        for(int c : coins)
+            if (c <= amount)
+                dp[c] = 1;
+        for(int i = 0; i <= amount; i++) {
+            if(dp[i] != -1) continue;
+            for(int c : coins) {
+                if(i >= c && dp[i - c] != -1)
+                    dp[i] = (dp[i] == -1) ? dp[i-c] + 1 : min(dp[i], dp[i - c] + 1);
             }
         }
-        if (nums[amount] == INTMAX) return -1;
-        return nums[amount];
+        return dp[amount];
     }
 };
