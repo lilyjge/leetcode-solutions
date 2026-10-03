@@ -1,42 +1,33 @@
 class Solution {
 public:
     bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
-        vector<int> adj[2001] = {};
-        vector<int> prereq[2001] = {};
-        bool cant[2001] = {};
-        for (vector<int> dep : prerequisites) {
-            adj[dep[1]].push_back(dep[0]);
-            prereq[dep[0]].push_back(dep[1]);
-            cant[dep[0]] = true;
-        }
+        // map each course to everything it unlocks, decrement on vis
+        // if req == 0 put into queue
+        vector<vector<int>> unlocks(numCourses, vector<int>());
+        vector<int> needs(numCourses, 0);
+        for(vector<int> req : prerequisites) {
+            unlocks[req[0]].push_back(req[1]);
+            needs[req[1]]++;
+        } 
         queue<int> q;
         for(int i = 0; i < numCourses; i++) {
-            if (!cant[i]) {
+            if(needs[i] == 0) {
                 q.push(i);
-                cant[i] = true;
-                // cout << "initial can take "  << i << endl;
+                needs[i]--;
             }
-        } // cant -> havent
+        }
         while(!q.empty()) {
             int cur = q.front(); q.pop();
-            // cout << "at " << cur << " cant " << cant[cur] << endl;
-            if (!cant[cur]) continue;
-            bool flag = false;
-            for(int dep : prereq[cur]) {
-                if (cant[dep]) {
-                    flag = true; 
-                    break;
+            for(int i : unlocks[cur]) {
+                needs[i]--;
+                if(needs[i] == 0) {
+                    q.push(i);
+                    needs[i]--;
                 }
             }
-            // cout << "flag " << flag << endl;
-            if (flag) continue;
-            cant[cur] = false;
-            for (int nxt : adj[cur])
-                q.push(nxt);
         }
-        for(int i = 0; i < numCourses; i++) {
-            if (cant[i]) return false;
-        }
+        for(int i = 0; i < numCourses; i++)
+            if (needs[i] > 0 ) return false;
         return true;
     }
 };
